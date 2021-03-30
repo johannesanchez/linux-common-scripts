@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-OS=$(cat /etc/*release)
-echo OS > $OS|grep ID
+# OS=$(cat /etc/*release)
+# echo OS > $OS|grep ID
 
 echo "Ingress Software to Install "
 
