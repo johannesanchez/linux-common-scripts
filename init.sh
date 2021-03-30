@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-# Constants
-1="postgres"
-2="python"
-a=pckman
-b=source
-
 OS=$(cat /etc/*release)
 echo OS > $OS|grep ID
 
@@ -17,7 +11,7 @@ Ingress the Software # to install :
 2. Python
 3. all
 EOF
-read software
+sudo read software
 echo Software to install: $software
 
 cat << EOF
@@ -25,17 +19,9 @@ Ingress the Software # to install :
 1. Package Manager
 2. Source Code
 EOF
-read installation_type
+sudo read installation_type
 
-# echo Type of installation: $installation_type
-
-# case $software in
-#   source) typeinstall=$a
-#   ;;
-#   pckman) typeinstall=$b
-#   ;;
-# esac
-
+echo Type of installation: $installation_type
 
 
 echo "sudo yum update -y"
@@ -58,7 +44,7 @@ else
 folderInst=./centos8/source
 fi
 
-# sudo git clone https://github.com/johannesanchez/linux-common-scripts.git
+sudo git clone https://github.com/johannesanchez/linux-common-scripts.git
 
 if [ $software = 1 ] 
 then
