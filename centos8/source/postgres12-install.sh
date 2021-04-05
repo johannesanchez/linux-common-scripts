@@ -69,17 +69,42 @@ $BIN_FOLDER/postgresql-12.3-installers/bin/pg_ctl -D $DATA_FOLDER/ -l $LOG_FOLDE
 # original permissions:644
 # /etc/rc.d/rc.local
 sudo chmod 777 /etc/rc.d/rc.local
-sudo echo "sudo -u postgres /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" start" >> /etc/rc.local
-# echo /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" start >> /etc/rc.local
-# echo $BIN_FOLDER/postgresql-12.3-installers/bin/pg_ctl -D $DATA_FOLDER/ -l $LOG_FOLDER/12.3_postgres_logfile.log -o "-p 5432" start >> /etc/rc.local
+sudo echo 'sudo -u postgres /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" start' >> /etc/rc.local
+
+
+###############################################################
+# POST INSTALLATION STEPS
+# Changing the default password for postgres user
+# psql -c "alter user postgres with password 'thepasswordhere'"
+
+
+
+# Accepting external connections. Please change it under your responsibility.
+# Edit /postgres/data/postgres/postgresql.conf
+
+# Before:
+#listen_addresses = 'localhost'		# what IP address(es) to listen on;
+
+# After:
+#listen_addresses = '*'		# what IP address(es) to listen on;
+
+# Edit /postgres/data/postgres/postgresql.conf
+
+# Before: 
+# "local" is for Unix domain socket connections only
+# local   all             all                                     trust
+
+# After:
+# "local" is for Unix domain socket connections only
+# local   all             all                                     trust
+# host    all             all         0.0.0.0/0                   md5
+
+# restart postgres instance:
+# /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" stop
+# /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" start
 
 
 # #test the connection
 # psql
-
 # select version();
 # show port;
-
-# Creating database
-# /usr/local/pgsql/bin/createdb test
-# /usr/local/pgsql/bin/psql test
