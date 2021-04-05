@@ -1,24 +1,28 @@
 #!/usr/bin/env bash
-# Upgrade all installed packages
-# su - postgres
-sudo useradd postgres
-sudo passwd postgres
 
-# visudo
+# RUN NEXT COMMANDS AS ROOT USER
+# Create postgres user
+# sudo useradd postgres && sudo passwd postgres
+
+# Grants for postgres user
+# sudo visudo
 # postgres    ALL=(ALL)      ALL
 
-su - postgres
+# Switch to postgres user
+# su - postgres
 
-# yum update #optional
+# RUN NEXT COMMANDS AS postgres USER
 
 # Folder Locations
 LOG_FOLDER=/postgres/logs
 DATA_FOLDER=/postgres/data/postgres
 BIN_FOLDER=/postgres/bin
 
+# Upgrade all installed packages (optional)
+# yum update -y
 
+# Install necessary packages
 sudo yum install wget gcc make bzip2 -y
-
 
 # For extreme amount of activity
 sudo mkdir /postgres && sudo chown postgres. -R /postgres
@@ -40,20 +44,6 @@ tar -xvf postgresql-12.3.tar.bz2 && \
 make  && make install
 
 
-#run postgres for the first time
-cd $BIN_FOLDER/postgresql-12.3-installers && \
-./bin/initdb -D $DATA_FOLDER -U postgres  && \
-# ./bin/pg_ctl -D /databases/postgres/postgres_data -l /databases/postgres/postgres_logs/12.3_postgres_logfile.log -o "-p 5432" start
-$BIN_FOLDER/postgresql-12.3-installers/bin/pg_ctl -D $DATA_FOLDER/ -l $LOG_FOLDER/12.3_postgres_logfile.log -o "-p 5432" start
-
-
-# cat <<EOT >> ~/.bashrc
-# export PATH=$BIN_FOLDER/postgresql-12.3-installers/bin:$PATH
-# export PGDATA=$DATA_FOLDER
-# export PGUSER=postgres
-# export PGPORT=5432 #Hardening: your choise if you want to change the default port
-# EOT
-
 
 cat >> ~/.bashrc <<EOL 
 export PATH=${BIN_FOLDER}/postgresql-12.3-installers/bin:$PATH
@@ -68,11 +58,19 @@ EOL
 source ~/.bashrc
 
 
+#run postgres for the first time
+cd $BIN_FOLDER/postgresql-12.3-installers && \
+./bin/initdb -D $DATA_FOLDER -U postgres  && \
+# ./bin/pg_ctl -D /databases/postgres/postgres_data -l /databases/postgres/postgres_logs/12.3_postgres_logfile.log -o "-p 5432" start
+$BIN_FOLDER/postgresql-12.3-installers/bin/pg_ctl -D $DATA_FOLDER/ -l $LOG_FOLDER/12.3_postgres_logfile.log -o "-p 5432" start
+
+
 #adding start postgres at boot
 # original permissions:644
 # /etc/rc.d/rc.local
-sudo chmod 777 /etc/rc.local
-echo /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" start >> /etc/rc.local
+sudo chmod 777 /etc/rc.d/rc.local
+sudo echo "sudo -u postgres /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" start" >> /etc/rc.local
+# echo /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postgres -l /postgres/logs/12.3_postgres_logfile.log -o "-p 5432" start >> /etc/rc.local
 # echo $BIN_FOLDER/postgresql-12.3-installers/bin/pg_ctl -D $DATA_FOLDER/ -l $LOG_FOLDER/12.3_postgres_logfile.log -o "-p 5432" start >> /etc/rc.local
 
 
@@ -81,7 +79,6 @@ echo /postgres/bin/postgresql-12.3-installers/bin/pg_ctl -D /postgres/data/postg
 
 # select version();
 # show port;
-
 
 # Creating database
 # /usr/local/pgsql/bin/createdb test
